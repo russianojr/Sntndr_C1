@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>click demo</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+          integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+
+
+    <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+</head>
+<body>
+<style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #61778a;
+            font-family: "Open Sans", arial;
+        }
+
+        table {
+            width: 100%;
+            max-width: 800px;
+            height: 320px;
+            border-collapse: collapse;
+            border: 1px solid #38678f;
+            margin: 50px auto;
+            background: white;
+        }
+
+        th {
+            background: #8c4343; /*********/
+            height: 54px;
+            width: 25%;
+            font-weight: lighter;
+            text-shadow: 0 1px 0 #38678f;
+            color: white;
+            border: 1px solid #38678f;
+            box-shadow: inset 0px 1px 2px #568ebd;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        tr {
+            border-bottom: 1px solid #cccccc;
+        }
+
+            tr:last-child {
+                border-bottom: 0px;
+            }
+
+        td {
+            border-right: 1px solid #cccccc;
+            padding: 10px;
+            transition: all 0.2s;
+        }
+
+            td:last-child {
+                border-right: 0px;
+            }
+
+            td.selected {
+                background: #d7e4ef;
+                z-index:;
+            }
+
+            td input {
+                font-size: 14px;
+                background: none;
+                outline: none;
+                border: 0;
+                display: table-cell;
+                height: 100%;
+                width: 100%;
+            }
+
+                td input:focus {
+                    box-shadow: 0 1px 0 #61778a;
+                    color: #61778a;
+                }
+
+        ::-moz-selection {
+            background: #61778a;
+            color: white;
+        }
+
+        ::selection {
+            background: #61778a;
+            color: white;
+        }
+
+        .heavyTable {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: float 5s infinite;
+        }
+
+        .main {
+            max-width: 600px;
+            padding: 10px;
+            margin: auto;
+        }
+
+        .content {
+            color: white;
+            text-align: center;
+        }
+
+            .content p,
+            .content pre,
+            .content h2 {
+                text-align: left;
+            }
+
+            .content pre {
+                padding: 1.2em 0 0.5em;
+                background: white;
+                background: rgba(255, 255, 255, 0.7);
+                border: 1px solid rgba(255, 255, 255, 0.9);
+                color: #38678f;
+            }
+
+            .content .topo {
+                margin: auto;
+                background: rgba(255, 255, 255, 0.1);
+                display: inline-block;
+                padding: 1em 1em;
+                border-radius: 12em;
+                margin-bottom: 2em;
+            }
+
+            .content .button {
+                display: inline-block;
+                text-decoration: none;
+                color: white;
+                height: 48px;
+                line-height: 48px;
+                padding: 0 20px;
+                border-radius: 24px;
+                border: 1px solid #38678f;
+                background: #8c4343;
+                box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 1px 3px rgba(255, 255, 255, 0.2);
+                transition: all 0.1s;
+                cursor: pointer;
+            }
+
+                .content .button:hover {
+                    background: #4f8aba;
+                    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 0 10px rgba(255, 255, 255, 0.1);
+                }
+
+                .content .button:active {
+                    color: #294d6b;
+                    background: #427aa9;
+                    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 0 5px rgba(0, 0, 0, 0.2);
+                }
+
+                .content .button:focus {
+                    outline: none;
+                }
+
+        h1 {
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+    </style>
+<div class='main'>
+    <section class="content">
+
+        <div class="topo">
+            <input type='text' id='actor' />
+            <div class="button" id='busca'>Buscar </div>
+            <div class="button ppt">Para POWER POINT</div>
+        </div>
+    </section>
+
+
+    <table id="movieTable" class="heavyTable" />
+</div>
+<script>
+        $(".button").click(function () {
+            var url = '';
+            var ppt = false;
+            if ($(this).hasClass('ppt')) {
+                url = "http://localhost:8080/movies/getFile/" + actor.value;
+                window.location.href = url;
+                return;
+                }
+            else
+                url = "http://localhost:8080/movies/busca/";
+
+            $.getJSON(url + actor.value, function (data) {
+                //alert("success");
+
+                var retornoRest = (data[0]);
+                console.log(retornoRest);
+                var keys = [];
+                for (var key in retornoRest[0]) {
+                    keys.push(key);
+                }
+                addThead(keys);
+
+
+                for (var j = 0; j < retornoRest.length; j++) {
+                    var row$ = $('<tr/>');
+                    obj = retornoRest[j]
+                    for (var i = 0; i < keys.length; i++) {
+
+                        var key = keys[i];
+                        var cellValue = obj[key];
+
+                        if (cellValue == null) {
+                            cellValue = "";
+                        }
+
+                        row$.append($('<td/>').html(cellValue));
+                    }
+
+                    $("#movieTable").append(row$);
+                }
+            })
+
+        });
+
+        function addThead(keys) {
+
+            var thead = $('<thead/>');
+            var tr = $('<tr/>');
+
+            for (var i = 0; i < keys.length; i++) {
+                var key = keys[i];
+                tr.append($('<th/>').html(key));
+            }
+            thead.append(tr);
+            $("#movieTable").append(thead);
+        }
+
+
+    </script>
+</body>
+</html>
